@@ -110,10 +110,21 @@
             const node = document.importNode(postItemTpl.content, true)
             node.querySelector('.post-title').innerHTML = sanitize(p.title)
             node.querySelector('.post-content').innerHTML = sanitize(p.content)
-            const meta = `by ${sanitize(p.author)} • ${formatDateTime(p.createdAt)}${p.updatedAt && p.updatedAt !== p.createdAt ? ' • edited ' + formatDateTime(p.updatedAt) : ''}`
+            const authorDisplay = p.authorName || p.author || p.authorEmail || 'Unknown'
+            const createdDt = asDate(p.createdAt)
+            const updatedDt = asDate(p.updatedAt)
+            const editedSuffix = (createdDt && updatedDt && updatedDt.getTime() > createdDt.getTime())
+                ? ' • edited ' + formatDateTime(updatedDt)
+                : ''
+            const meta = `by ${sanitize(authorDisplay)} • ${formatDateTime(createdDt)}${editedSuffix}`
             node.querySelector('.post-meta').textContent = meta
             const actions = node.querySelector('.post-actions')
-            if (currentUser && currentUser.email === p.author) {
+            const isOwner = !!(currentUser && (
+                (p.authorUid && currentUser.uid === p.authorUid) ||
+                (p.authorEmail && currentUser.email === p.authorEmail) ||
+                (p.author && currentUser.email === p.author)
+            ))
+            if (isOwner) {
                 const editBtn = document.createElement('button')
                 editBtn.className = 'btn btn-secondary'
                 editBtn.textContent = 'Edit'
@@ -130,7 +141,9 @@
                 delBtn.textContent = 'Delete'
                 delBtn.addEventListener('click', async () => {
                     if (!confirm('Delete this post?')) return
-                    await Posts.remove(p.id)
+                    const { db } = window.firebaseServices
+                    const { deleteDoc, doc } = window.firebaseDbFns
+                    await deleteDoc(doc(db, 'posts', p.id))
                     await reloadPosts()
                 })
                 actions.append(editBtn, delBtn)
@@ -239,7 +252,9 @@
             await addDoc(collection(db, 'posts'), {
                 title,
                 content,
-                author: authorLabel,
+                authorName: authorLabel,
+                authorEmail: current.email,
+                authorUid: current.uid,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             })
