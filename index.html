@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Blog</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header class="app-header">
+        <h1>Mini Blog</h1>
+        <div id="authBar" class="auth-bar hidden">
+            <span id="welcomeText"></span>
+            <button id="logoutBtn" class="btn btn-outline">Logout</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Auth Panels -->
+        <section id="authPanels" class="grid-2">
+            <div class="card">
+                <h2>Register</h2>
+                <form id="registerForm">
+                    <label>Username
+                        <input id="regUsername" type="text" autocomplete="nickname" required />
+                    </label>
+                    <label>Email
+                        <input id="regEmail" type="email" autocomplete="email" required />
+                    </label>
+                    <label>Password
+                        <input id="regPassword" type="password" autocomplete="new-password" required />
+                    </label>
+                    <button class="btn" type="submit">Create Account</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <label>Email
+                        <input id="loginEmail" type="email" autocomplete="email" required />
+                    </label>
+                    <label>Password
+                        <input id="loginPassword" type="password" autocomplete="current-password" required />
+                    </label>
+                    <button class="btn" type="submit">Login</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- App Panel -->
+        <section id="appPanel" class="hidden">
+            <div class="card">
+                <h2>Create Post</h2>
+                <form id="postForm">
+                    <label>Title
+                        <input id="postTitle" type="text" maxlength="120" required />
+                    </label>
+                    <label>Content
+                        <textarea id="postContent" rows="6" required></textarea>
+                    </label>
+                    <div class="row gap">
+                        <button class="btn" type="submit">Publish</button>
+                        <button class="btn btn-outline hidden" id="cancelEditBtn" type="button">Cancel Edit</button>
+                    </div>
+                    <input type="hidden" id="editingPostId" />
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="row space-between">
+                    <h2>All Posts</h2>
+                    <label class="search">
+                        <input id="searchInput" type="search" placeholder="Search title/content" />
+                    </label>
+                </div>
+                <div id="postsList" class="posts"></div>
+            </div>
+        </section>
+    </main>
+
+    <template id="postItemTpl">
+        <article class="post">
+            <header class="post-header">
+                <h3 class="post-title"></h3>
+                <div class="post-meta"></div>
+            </header>
+            <p class="post-content"></p>
+            <footer class="post-actions"></footer>
+        </article>
+    </template>
+
+    <script src="firebase-config.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'
+
+        const firebaseConfig = window.FIREBASE_CONFIG
+        if (!firebaseConfig || !firebaseConfig.apiKey || String(firebaseConfig.apiKey).startsWith('REPLACE_')) {
+            alert('Firebase config is missing or invalid. Copy firebase-config.example.js to firebase-config.js and fill your keys.')
+        }
+
+        const app = initializeApp(firebaseConfig)
+        const auth = getAuth(app)
+        const db = getFirestore(app)
+
+        window.firebaseServices = { auth, db }
+        window.firebaseAuthFns = { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut }
+        window.firebaseDbFns = { collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp }
+    </script>
+    <script src="app.js"></script>
+    <noscript>
+        This app requires JavaScript. Please enable it to use the mini blog.
+    </noscript>
+</body>
+</html>
+
+
