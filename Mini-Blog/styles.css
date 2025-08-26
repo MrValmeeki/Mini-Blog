@@ -1,0 +1,91 @@
+:root {
+    --bg: #0f172a;
+    --panel: #111827;
+    --muted: #94a3b8;
+    --text: #e5e7eb;
+    --accent: #22c55e;
+    --accent-2: #60a5fa;
+    --danger: #ef4444;
+    --border: #1f2937;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    background: var(--bg);
+    color: var(--text);
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #0b1020;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.container { max-width: 980px; margin: 24px auto; padding: 0 16px; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+h1, h2, h3 { margin: 0 0 12px; }
+
+label { display: block; font-size: 14px; color: var(--muted); margin: 8px 0; }
+input, textarea {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px 12px;
+    background: #0b1020;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.row { display: flex; align-items: center; }
+.gap { gap: 8px; }
+.space-between { justify-content: space-between; }
+
+.btn {
+    background: var(--accent);
+    color: #032312;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.btn:hover { filter: brightness(1.05); }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: var(--danger); color: #2b0909; }
+.btn-secondary { background: var(--accent-2); color: #071522; }
+
+.auth-bar { display: flex; align-items: center; gap: 10px; }
+.hidden { display: none !important; }
+
+.posts { display: grid; gap: 12px; }
+.post { border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: #0d1428; }
+.post-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.post-title { margin: 0; }
+.post-meta { color: var(--muted); font-size: 12px; }
+.post-actions { display: flex; gap: 8px; margin-top: 8px; }
+
+.search input { width: 240px; }
+
+.notice { color: var(--muted); font-size: 14px; text-align: center; padding: 8px 0; }
+
+
