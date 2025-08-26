@@ -58,6 +58,11 @@
         return div.innerHTML
     }
 
+    function normalizeString(value) {
+        if (value == null) return ''
+        return String(value).trim().toLowerCase()
+    }
+
     // Firebase handles auth; we mirror minimal UI state locally
     const Session = {
         getUser() {
@@ -124,11 +129,16 @@
             const meta = `by ${sanitize(authorDisplay)} • ${formatDateTime(createdDt)}${editedSuffix}`
             node.querySelector('.post-meta').textContent = meta
             const actions = node.querySelector('.post-actions')
+            const cuEmail = currentUser ? normalizeString(currentUser.email) : ''
+            const cuName = currentUser ? normalizeString(currentUser.username || currentUser.displayName) : ''
+            const postAuthor = normalizeString(p.author)
+            const postAuthorName = normalizeString(p.authorName)
+            const postAuthorEmail = normalizeString(p.authorEmail)
             const isOwner = !!(currentUser && (
                 (p.authorUid && currentUser.uid === p.authorUid) ||
-                (p.authorEmail && currentUser.email === p.authorEmail) ||
-                (p.author && (currentUser.email === p.author || currentUser.username === p.author)) ||
-                (p.authorName && currentUser.username === p.authorName)
+                (postAuthorEmail && cuEmail === postAuthorEmail) ||
+                (postAuthor && (cuEmail === postAuthor || cuName === postAuthor)) ||
+                (postAuthorName && cuName === postAuthorName)
             ))
             if (isOwner) {
                 const editBtn = document.createElement('button')
@@ -190,7 +200,7 @@
             })
 
             // Update UI/session
-            Session.setUser({ uid: cred.user.uid, email: cred.user.email })
+            Session.setUser({ uid: cred.user.uid, email: cred.user.email, username: displayName || cred.user.email })
             setLoggedIn(displayName || cred.user.email)
             await reloadPosts()
             registerForm.reset(); loginForm.reset()
@@ -207,15 +217,18 @@
             const { auth } = window.firebaseServices
             const { signInWithEmailAndPassword } = window.firebaseAuthFns
             const cred = await signInWithEmailAndPassword(auth, email, password)
-            Session.setUser(cred.user)
+            // Store username for ownership checks
             // Try to show username if available from Firestore
             try {
                 const { db } = window.firebaseServices
                 const { getDocs, collection } = window.firebaseDbFns
                 const snap = await getDocs(collection(db, 'users'))
                 const profile = snap.docs.map(d => d.data()).find(p => p.uid === cred.user.uid)
-                setLoggedIn((profile && profile.username) || cred.user.email)
+                const name = (profile && profile.username) || cred.user.email
+                Session.setUser({ uid: cred.user.uid, email: cred.user.email, username: name })
+                setLoggedIn(name)
             } catch {
+                Session.setUser({ uid: cred.user.uid, email: cred.user.email, username: cred.user.email })
                 setLoggedIn(cred.user.email)
             }
             await reloadPosts()
