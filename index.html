@@ -94,7 +94,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'
 
         const firebaseConfig = window.FIREBASE_CONFIG
         if (!firebaseConfig || !firebaseConfig.apiKey || String(firebaseConfig.apiKey).startsWith('REPLACE_')) {
@@ -107,7 +107,7 @@
 
         window.firebaseServices = { auth, db }
         window.firebaseAuthFns = { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut }
-        window.firebaseDbFns = { collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp }
+        window.firebaseDbFns = { collection, addDoc, getDocs, query, orderBy, updateDoc, deleteDoc, doc, serverTimestamp, where }
     </script>
     <script src="app.js"></script>
     <noscript>

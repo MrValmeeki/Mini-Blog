@@ -187,8 +187,19 @@
         try {
             const { auth, db } = window.firebaseServices
             const { createUserWithEmailAndPassword } = window.firebaseAuthFns
-            const { collection, addDoc } = window.firebaseDbFns
+            const { collection, addDoc, getDocs, query, where } = window.firebaseDbFns
             const displayName = regUsername.value.trim()
+            const usernameLower = displayName.trim().toLowerCase()
+            if (usernameLower) {
+                // Check uniqueness
+                const usersRef = collection(db, 'users')
+                const q = query(usersRef, where('usernameLower', '==', usernameLower))
+                const snap = await getDocs(q)
+                if (!snap.empty) {
+                    alert('Username already taken. Please choose another.')
+                    return
+                }
+            }
             const cred = await createUserWithEmailAndPassword(auth, email, password)
 
             // Save profile to Firestore (users collection)
@@ -196,6 +207,7 @@
                 uid: cred.user.uid,
                 email: cred.user.email,
                 username: displayName,
+                usernameLower: (displayName || '').toLowerCase(),
                 createdAt: new Date().toISOString()
             })
 
