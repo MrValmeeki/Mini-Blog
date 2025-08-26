@@ -65,7 +65,12 @@
             return u ? JSON.parse(u) : null
         },
         setUser(user) {
-            localStorage.setItem('mini_blog_user', JSON.stringify({ uid: user.uid, email: user.email }))
+            const toStore = {
+                uid: user.uid,
+                email: user.email,
+                username: user.username || user.displayName || (user.email || '')
+            }
+            localStorage.setItem('mini_blog_user', JSON.stringify(toStore))
         },
         clear() { localStorage.removeItem('mini_blog_user') }
     }
@@ -122,7 +127,8 @@
             const isOwner = !!(currentUser && (
                 (p.authorUid && currentUser.uid === p.authorUid) ||
                 (p.authorEmail && currentUser.email === p.authorEmail) ||
-                (p.author && currentUser.email === p.author)
+                (p.author && (currentUser.email === p.author || currentUser.username === p.author)) ||
+                (p.authorName && currentUser.username === p.authorName)
             ))
             if (isOwner) {
                 const editBtn = document.createElement('button')
@@ -285,6 +291,8 @@
                     const profile = snap.docs.map(d => d.data()).find(p => p.uid === user.uid)
                     if (profile && profile.username) name = profile.username
                 } catch {}
+                // persist username for ownership checks on legacy posts
+                Session.setUser({ uid: user.uid, email: user.email, username: name })
                 setLoggedIn(name)
                 await reloadPosts()
             } else {
